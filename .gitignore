@@ -3,5 +3,5 @@ test*.py
 .DS_Store
 __pycache__
 settings.json
-
+.vscode
 keys.py

@@ -3,6 +3,7 @@ from flask_cors import CORS, cross_origin
 
 from keys import *
 from libs.TweetStream import FreeStream
+from utils.TextDecoder import addHashtag
 
 
 #----------- App configuration -----------#
@@ -32,7 +33,11 @@ def index():
 # put a hashtag to search
 @app.route('/hash/<hashtag>')
 def setHash(hashtag):
-    hashtag = f'#{hashtag}' if '#' not in hashtag else hashtag
+    hashtag = addHashtag(hashtag)
+
+    global current_topic
+    current_topic = hashtag
+
     stream.filter(track=[hashtag], threaded=True, languages=['en', 'es'])
     
     return style+f'Streaming started with: {hashtag}'
