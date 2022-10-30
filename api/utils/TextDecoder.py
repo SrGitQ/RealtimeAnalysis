@@ -1,12 +1,12 @@
 
-def addHashtag(text:str) -> str:
+def addSymbolHash(text:str) -> str:
     '''
         This will add a '#' if the text does not have it
 
-        # Parameters
+        ## Parameters
         text: str
 
-        # Returns
+        ## Returns
         '#<text>'
     '''
     return f'#{text}' if '#' not in text else text

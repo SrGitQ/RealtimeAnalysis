@@ -2,8 +2,8 @@ from flask import Flask
 from flask_cors import CORS, cross_origin
 
 from keys import *
-from libs.TweetStream import FreeStream
-from utils.TextDecoder import addHashtag
+from libs.Tweet import HashtagStream
+from utils.TextDecoder import addSymbolHash
 
 
 #----------- App configuration -----------#
@@ -15,7 +15,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # stream
-stream = FreeStream(API_KEY, API_KEY_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
+stream = HashtagStream(API_KEY, API_KEY_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
 
 
 #-------------- App routes --------------#
@@ -33,7 +33,7 @@ def index():
 # put a hashtag to search
 @app.route('/hash/<hashtag>')
 def setHash(hashtag):
-    hashtag = addHashtag(hashtag)
+    hashtag = addSymbolHash(hashtag)
 
     global current_topic
     current_topic = hashtag
