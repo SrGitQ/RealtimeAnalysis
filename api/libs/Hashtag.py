@@ -57,9 +57,15 @@ class HashtagArticle:
         if data:
             self.amendData(data)
 
+
     def insertTweet(self, tweet:dict):
         pass
 
+
     def amendData(self, data:dict):
-        pass
+        '''
+            It will replace the default values of the object
+            with the current values.
+        '''
+        [setattr(self, key, data[key]) for key in data]
 
