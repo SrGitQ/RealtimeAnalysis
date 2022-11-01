@@ -130,7 +130,7 @@ class TweetParser(Tweet):
         max_score = max([x['score'] for x in data[0]])
         
         # get the label  and asign
-        self.sentiment = [x['label'] for x in data[0] if x['score'] == max_score][0]
+        self.sentiment = [x['label'] for x in data[0] if x['score'] == max_score][0].lower()
     
 
     def __identify_location(self, ):
@@ -141,7 +141,7 @@ class TweetParser(Tweet):
         '''
         try:
             location = geolocator.geocode(self.user_loc)
-            self.user_loc:dict[str, float] = location # type: ignore
+            self.user_loc:dict[str, float] = {'lat':location.latitude, 'lon':location.longitude} # type: ignore
 
         except:
             self.user_loc:dict[str, float] = {'lat':47.0000, 'lon':-87.30020}
@@ -269,6 +269,9 @@ class HashtagArticle:
         if addSymbolHash(self.hashtag) not in self.hashtags:
             self.hashtags.append(addSymbolHash(self.hashtag))
             self.hashtags_count += 1
+        
+        if len(self.sentiment_timeline) > 5:
+            self.sentiment_timeline = self.sentiment_timeline[-4:]
 
 
     def insertTweet(self, tweet:dict):
@@ -292,7 +295,7 @@ class HashtagArticle:
         # hashtags, hashtags_count and hashtag_links
         for hashtag in tweet_fit.hashtags:
             hashtag = hashtag.lower()
-            if hashtag not in self.hashtags:
+            if hashtag not in self.hashtags and len(hashtag) > 1:
                 # append the hashtag node
                 self.hashtags.append(hashtag)
                 self.hashtags_count += 1
@@ -307,10 +310,9 @@ class HashtagArticle:
         self.mentions += tweet_fit.mentions
 
         # locations and locations_count
-        if type(tweet_fit.user_loc) == type(dict):
-            if tweet_fit.user_loc not in self.locations:
-                self.locations.append(tweet_fit.user_loc)
-                self.locations_count += 1
+        if tweet_fit.user_loc not in self.locations and tweet_fit.user_loc != {'lat':47.0000, 'lon':-87.30020}:
+            self.locations.append(tweet_fit.user_loc)
+            self.locations_count += 1
  
         # raw
         self.raw.append(tweet_fit.__dict__)
@@ -334,6 +336,8 @@ class HashtagArticle:
         # verified_count
         if tweet_fit.user_verified:
             self.verified_count += 1
+        
+        self.__normalize_article()
 
 
     def amendData(self, data:dict):
@@ -360,7 +364,7 @@ def entry(request):
 
     if article:
         id = list(article.keys())[0]
-        current_article = HashtagArticle(article)
+        current_article = HashtagArticle(article[id])
         current_article.insertTweet(tweet)
         requests.put('https://twitter-streaming-365514-default-rtdb.firebaseio.com/'+topic+'.json', json={id:current_article.__dict__})
         

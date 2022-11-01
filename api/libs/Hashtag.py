@@ -97,6 +97,9 @@ class HashtagArticle:
         if addSymbolHash(self.hashtag) not in self.hashtags:
             self.hashtags.append(addSymbolHash(self.hashtag))
             self.hashtags_count += 1
+        
+        if len(self.sentiment_timeline) > 5:
+            self.sentiment_timeline = self.sentiment_timeline[-4:]
 
 
     def insertTweet(self, tweet:dict):
@@ -120,7 +123,7 @@ class HashtagArticle:
         # hashtags, hashtags_count and hashtag_links
         for hashtag in tweet_fit.hashtags:
             hashtag = hashtag.lower()
-            if hashtag not in self.hashtags:
+            if hashtag not in self.hashtags and len(hashtag) > 1:
                 # append the hashtag node
                 self.hashtags.append(hashtag)
                 self.hashtags_count += 1
@@ -135,10 +138,9 @@ class HashtagArticle:
         self.mentions += tweet_fit.mentions
 
         # locations and locations_count
-        if type(tweet_fit.user_loc) == type(dict):
-            if tweet_fit.user_loc not in self.locations:
-                self.locations.append(tweet_fit.user_loc)
-                self.locations_count += 1
+        if tweet_fit.user_loc not in self.locations and tweet_fit.user_loc != {'lat':47.0000, 'lon':-87.30020}:
+            self.locations.append(tweet_fit.user_loc)
+            self.locations_count += 1
  
         # raw
         self.raw.append(tweet_fit.__dict__)
@@ -162,6 +164,8 @@ class HashtagArticle:
         # verified_count
         if tweet_fit.user_verified:
             self.verified_count += 1
+        
+        self.__normalize_article()
 
 
     def amendData(self, data:dict):

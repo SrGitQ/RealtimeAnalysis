@@ -118,7 +118,7 @@ class TweetParser(Tweet):
         max_score = max([x['score'] for x in data[0]])
         
         # get the label  and asign
-        self.sentiment = [x['label'] for x in data[0] if x['score'] == max_score][0]
+        self.sentiment = [x['label'] for x in data[0] if x['score'] == max_score][0].lower()
     
 
     def __identify_location(self, ):
@@ -129,7 +129,7 @@ class TweetParser(Tweet):
         '''
         try:
             location = geolocator.geocode(self.user_loc)
-            self.user_loc:dict[str, float] = location # type: ignore
+            self.user_loc:dict[str, float] = {'lat':location.latitude, 'lon':location.longitude} # type: ignore
 
         except:
             self.user_loc:dict[str, float] = {'lat':47.0000, 'lon':-87.30020}
