@@ -6,3 +6,4 @@ settings.json
 .vscode
 keys.py
 *.json
+/test

@@ -1,3 +1,5 @@
+from libs.Tweet import Tweet, TweetParser
+
 class HashtagArticle:
     '''
         `IMPORTANT! This object is usually used in Google Cloud Functions`
@@ -59,7 +61,8 @@ class HashtagArticle:
 
 
     def insertTweet(self, tweet:dict):
-        pass
+        tweet_fit = TweetParser(**tweet)
+        print(tweet_fit.__dict__)
 
 
     def amendData(self, data:dict):
