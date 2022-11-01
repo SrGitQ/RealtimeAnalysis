@@ -60,7 +60,7 @@ class TweetParser(Tweet):
     '''
     def __init__(self, user_name='', user_verified=False, tweet_text='', user_loc='', tweet_id='', source='', hashtags=[], mentions=0):
         super().__init__(user_name, user_verified, tweet_text, user_loc, tweet_id, source, hashtags, mentions)
-        
+
         self.sentiment:str = ''
 
         self.__identify_sentiment()
@@ -71,9 +71,24 @@ class TweetParser(Tweet):
 
     
     def __identify_sentiment(self, ):
-        pass
+        from keys import ROVERTA
+        '''
+            This use the API of RoverTa to identify
+            which sentiment domain the text of the tweet.
+        '''
+        URL = "https://api-inference.huggingface.co/models/cardiffnlp/twitter-xlm-roberta-base-sentiment"
+        headers = {"Authorization": ROVERTA}
 
+        # analyse the sentiment
+        data = requests.post(URL, headers=headers, json={"inputs": self.tweet_text}).json()
+
+        # sort indexes for sentiment score
+        max_score = max([x['score'] for x in output[0]])
+        
+        # get the label  and asign
+        self.sentiment = [x['label'] for x in output[0] if x['score'] == max_score][0]
     
+
     def __identify_location(self, ):
         '''
             Use Geopy to identify where the place is
@@ -82,7 +97,7 @@ class TweetParser(Tweet):
         '''
         try:
             location = geolocator.geocode(self.user_loc)
-            self.user_loc = location # type: ignore #{'lat':location.latitude, 'lon':location.longitude}
+            self.user_loc = location # type: ignore
 
         except:
             self.user_loc = {'lat':47.0000, 'lon':-87.30020}
