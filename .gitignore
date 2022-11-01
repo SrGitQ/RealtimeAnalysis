@@ -7,3 +7,6 @@ settings.json
 keys.py
 *.json
 /test
+/node_modules
+node_modules
+node_modules/*
