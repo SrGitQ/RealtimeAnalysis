@@ -37,7 +37,7 @@ def setHash(hashtag):
 
     global current_topic
     current_topic = hashtag
-
+    stream.topic = current_topic
     stream.filter(track=[hashtag], threaded=True, languages=['en', 'es'])
     
     return style+f'Streaming started with: {hashtag}'
@@ -46,6 +46,7 @@ def setHash(hashtag):
 # stop the streaming
 @app.route('/stop')
 def stopStream():
+    stream.topic = ''
     stream.running = False
     stream.disconnect()
 

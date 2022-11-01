@@ -1,8 +1,8 @@
 import tweepy
+import requests
 from utils.TextDecoder import addSymbolHash
 from geopy.geocoders import Nominatim
 geolocator = Nominatim(user_agent="MyApp")
-import requests
 
 class Tweet:
     '''
@@ -11,34 +11,45 @@ class Tweet:
         Static data from Stream tweepy
 
         ### Attributes
-        * user_name:str
-        * user_verified:bool
-        * tweet_text:str
-        * user_loc:str | dict
-        * tweet_id:str
-        * source:str
-        * hashtags:list
-        * mentiongs:int
-    '''
-    def __init__(self, 
-                    user_name = '',
-                    user_verified = False,
-                    tweet_text = '',
-                    user_loc = '',
-                    tweet_id = '',
-                    source = '',
-                    hashtags = [],
-                    mentions = 0
-                ):
 
+        :topic:str
+        
+        :user_name:str
+        
+        :user_verified:bool
+        
+        :tweet_text:str
+        
+        :user_loc:str | dict
+        
+        :tweet_id:str
+        
+        :source:str
+        
+        :hashtags:list
+        
+        :mentions:int
+    '''
+    def __init__(self,
+        topic = '',
+        user_name = '',
+        user_verified = False,
+        tweet_text = '',
+        user_loc = '',
+        tweet_id = '',
+        source = '',
+        hashtags = [],
+        mentions = 0
+    ):
+        self.topic:str = topic
         self.user_name:str = user_name
         self.user_verified:bool = user_verified
         self.tweet_text:str = tweet_text
         self.user_loc:str | dict = user_loc
         self.tweet_id:str = tweet_id
         self.source:str = source
-        self.hashtags:list = hashtags
-        self.mentiongs:int = mentions
+        self.hashtags:list[str] = hashtags
+        self.mentions:int = mentions
 
 
 class TweetParser(Tweet):
@@ -48,34 +59,55 @@ class TweetParser(Tweet):
         And analyse the missing data.
 
         ### Attributes
-        * user_name:str
-        * user_verified:bool
-        * tweet_text:str
-        * user_loc:str | dict
-        * tweet_id:str
-        * source:str
-        * hashtags:list
-        * mentiongs:int
-        * sentiment:str
+        
+        :topic:str
+        
+        :user_name:str
+        
+        :user_verified:bool
+        
+        :tweet_text:str
+        
+        :user_loc:dict
+        
+        :tweet_id:str
+        
+        :source:str
+        
+        :hashtags:list
+        
+        :mentions:int
+        
+        :sentiment:str
     '''
-    def __init__(self, user_name='', user_verified=False, tweet_text='', user_loc='', tweet_id='', source='', hashtags=[], mentions=0):
-        super().__init__(user_name, user_verified, tweet_text, user_loc, tweet_id, source, hashtags, mentions)
+    def __init__(self, topic='', user_name='', user_verified=False, tweet_text='', user_loc='', tweet_id='', source='', hashtags=[], mentions=0):
+        super().__init__(topic, user_name, user_verified, tweet_text, user_loc, tweet_id, source, hashtags, mentions)
 
         self.sentiment:str = ''
+
+        self.__normalize_tweet()
 
         self.__identify_sentiment()
 
         self.__identify_location()
 
         self.__identify_source()
+    
+
+    def __normalize_tweet(self, ):
+        self.topic = self.topic.lower()
+        self.user_name = self.user_name.lower()
+        self.tweet_text = self.tweet_text.lower()
+        self.source = self.source.lower()
+        self.hashtags = [hashtag.lower() for hashtag in self.hashtags]
 
     
     def __identify_sentiment(self, ):
-        from keys import ROVERTA
         '''
             This use the API of RoverTa to identify
             which sentiment domain the text of the tweet.
         '''
+        from keys import ROVERTA
         URL = "https://api-inference.huggingface.co/models/cardiffnlp/twitter-xlm-roberta-base-sentiment"
         headers = {"Authorization": ROVERTA}
 
@@ -97,10 +129,10 @@ class TweetParser(Tweet):
         '''
         try:
             location = geolocator.geocode(self.user_loc)
-            self.user_loc = location # type: ignore
+            self.user_loc:dict[str, float] = location # type: ignore
 
         except:
-            self.user_loc = {'lat':47.0000, 'lon':-87.30020}
+            self.user_loc:dict[str, float] = {'lat':47.0000, 'lon':-87.30020}
     
     
     def __identify_source(self, ):
@@ -110,12 +142,13 @@ class TweetParser(Tweet):
             source parameter, it will take the best option
             for the tweet.
         '''
-        categories = ['iOs', 'Android', 'Web']
+        categories = ['ios', 'android', 'web']
 
-        catalog = { 'iphone':categories[0], 'mac':categories[0], 'ios':categories[0],
-                    'android':categories[1], 'samsung':categories[1],
-                    'default':categories[2]
-                }
+        catalog = { 
+            'iphone':categories[0], 'mac':categories[0], 'ios':categories[0],
+            'android':categories[1], 'samsung':categories[1],
+            'default':categories[2]
+        }
 
         # iterate over all categories and devices until it find one
         for cat in catalog:
@@ -125,10 +158,12 @@ class TweetParser(Tweet):
 
         else:
             # else it will asign 'Web' category as default
-            self.source = 'Web'
+            self.source = 'web'
 
 
 class HashtagStream(tweepy.Stream):
+    topic = ''
+
     def on_connect(self,):
         print('streaming connection on route')
 
@@ -146,14 +181,15 @@ class HashtagStream(tweepy.Stream):
             mentions = 0
     
         tweet_data = Tweet(
-                            user_name=status.user.name,
-                            user_verified=status.user.verified,
-                            tweet_text=status.text,
-                            user_loc=status.user.location,
-                            tweet_id=status.id_str,
-                            source=status.source, 
-                            hashtags=hashtags,
-                            mentions=mentions
-                        )
-                        
-        print(tweet_data.__dict__)
+            topic=self.topic,
+            user_name=status.user.name,
+            user_verified=status.user.verified,
+            tweet_text=status.text,
+            user_loc=status.user.location,
+            tweet_id=status.id_str,
+            source=status.source, 
+            hashtags=hashtags,
+            mentions=mentions
+        )
+        requests.post('https://function-3-iy4drk2okq-ue.a.run.app', json=tweet_data.__dict__)
+        print('tweet_data.__dict__')
