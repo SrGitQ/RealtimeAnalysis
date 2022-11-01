@@ -83,10 +83,10 @@ class TweetParser(Tweet):
         data = requests.post(URL, headers=headers, json={"inputs": self.tweet_text}).json()
 
         # sort indexes for sentiment score
-        max_score = max([x['score'] for x in output[0]])
+        max_score = max([x['score'] for x in data[0]])
         
         # get the label  and asign
-        self.sentiment = [x['label'] for x in output[0] if x['score'] == max_score][0]
+        self.sentiment = [x['label'] for x in data[0] if x['score'] == max_score][0]
     
 
     def __identify_location(self, ):
