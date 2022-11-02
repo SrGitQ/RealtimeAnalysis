@@ -9,38 +9,34 @@ import {
 } from "react-router-dom";
 
 const data_test = {
-	hashtag: "hashtag",
-	tweets: 140,
-	users: 140,
-	mentions: 13,
-	places: 13,
-	verified: 13,
-	sentiment: {
-		positive: 0.60,
-		neutral: 0.20,
-		negative: 0.20,
-	},
+	hashtag: "",
+	tweets_count: 0,
+	users_list: [],
+	users_count: 0,
+	hashtags: [],
+	hashtags_count: 0,
+	hashtag_links: [],
+	mentions: 0,
+	locations:[],
+	locations_count:0,
+	raw:[],
 	devices: {
-		android: 33,
-		ios: 33,
-		web: 33,
+		ios:0,
+		android:0,
+		web:0,
 	},
-	no_users: 140,
-	sentiment_timeline: [
-		{ positive: 0.33, neutral: 0.53, negative: 0.33 },
-	],
-	hash_network:{
-			nodes: [
-				{ id: '#Harry' },
-			],
-			links: [
-				
-			]
+	sentiment_count:{
+		positive:0,
+		neutral:0,
+		negative:0
 	},
-	hashtags: 140,
-	places_locations:[
-		{ lat: 21.009293505988, lng: -89.69595640433737},
-	]
+	sentiment_average:{
+		positive:0.0,
+		neutral:0.0,
+		negative:0.0
+	},
+	sentiment_timeline:[],
+	verified_count:0
 }
 
 type Props = {
@@ -64,8 +60,9 @@ const App: React.FC = () => {
 	const [response, setResponse] = useState(data_test);
 
 	const getData = async () => {
-		const res = await fetch('http://127.0.0.1:5000/streamdata');
+		const res = await fetch('http://127.0.0.1:5000/status');
 		const data = await res.json() as typeof data_test;
+		console.log(data)
 
 		setResponse(data);
 	}
@@ -82,7 +79,7 @@ const App: React.FC = () => {
 					<BrowserRouter>
 						<Routes>
 							<Route path="/" element={<SearchLayout/>} />
-							<Route path="/stream" element={<StreamRunner data={response} network={response.hash_network}/>}/>
+							<Route path="/stream" element={<StreamRunner data={response} network={{nodes:response.hashtags?.map(e=>{return {id:e}}), links:response.hashtag_links}}/>}/>
 						</Routes>
 					</BrowserRouter>
 					

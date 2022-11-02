@@ -9,7 +9,7 @@ const SearchLayout:React.FC = () => {
 		<div className="flex justify-center h-full">
 			<div className="grid content-center">
 				<form onSubmit={() => {
-					fetch('http://localhost:5000/hashtag/'+search.replace('#', ''))
+					fetch('http://localhost:5000/hash/'+search.replace('#', ''))
 					navigate('/stream')
 
 				}}>

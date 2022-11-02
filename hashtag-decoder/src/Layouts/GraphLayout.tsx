@@ -2,7 +2,6 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
 import Bullet from '../Components/Bullet';
-import socketIOClient from 'socket.io-client';
 import { ForceGraph3D } from 'react-force-graph';
 import { useNavigate } from 'react-router-dom'
 
@@ -14,13 +13,8 @@ type Props = {
 
 const GraphLayout:React.FC<Props> = ({ changeLayout, data, network }) => {
 	const navigate = useNavigate();
+	console.log(network)
 
-	const ENDPOINT = 'http://localhost:5000'
-	
-	const closeSocket = () => {
-		const socket = socketIOClient(ENDPOINT);
-		socket.disconnect();
-	}
 	return (
 		<div className="h-full flex flex-col">
 			<div 
@@ -32,11 +26,10 @@ const GraphLayout:React.FC<Props> = ({ changeLayout, data, network }) => {
 			<div className="h-1/6">
 				<h1 className="text-white text-4xl font-bold"
 					onClick={
-						() => {
+						async () => {
 							navigate('/')
-							closeSocket()
+							await fetch('http://127.0.0.1:5000/stop')
 						}
-
 					}
 				>
 					{data.hashtag.includes('#') ? data.hashtag : `#${data.hashtag}`}
@@ -49,22 +42,20 @@ const GraphLayout:React.FC<Props> = ({ changeLayout, data, network }) => {
 					nodeColor={() => '#FB71F2'}
 					linkWidth={1}
 					onNodeDragEnd={node => {
-						node.fx = node.x;
-						node.fy = node.y;
-						node.fz = node.z;
+							node.fx = node.x;
+							node.fy = node.y;
+							node.fz = node.z;
+						}
 					}
-					
-					
-				}
-				width={900}
-				height={400}
-				backgroundColor='rgba(0,0,0,0)'
+					width={900}
+					height={400}
+					backgroundColor='rgba(0,0,0,0)'
 				/>
 			</div>
 			<div className='h-28 flex justify-between pl-28 pr-28'>
-				<Bullet title={'Tweets'} text={`${data.tweets}`}/>
-				<Bullet title={'Users'} text={`${data.no_users}`}/>
-				<Bullet title={'Hashtags'} text={`${data.hashtags}`}/>
+				<Bullet title={'Tweets'} text={`${data.tweets_count}`}/>
+				<Bullet title={'Users'} text={`${data.users_count}`}/>
+				<Bullet title={'Hashtags'} text={`${data.hashtags_count}`}/>
 			</div>
 		</div>
 	);

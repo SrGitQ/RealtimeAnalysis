@@ -30,7 +30,7 @@ const WorldR: React.FC <Globe_t> = ({ marks }) => {
 			pointsData={marks?.map((mark:any) => {
 				return {
 					lat: mark.lat,
-					lng: mark.lng,
+					lng: mark.lon,
 				}
 			})}
 			pointColor={() => '#219bf0'}

@@ -1,8 +1,9 @@
 from flask import Flask
 from flask_cors import CORS, cross_origin
-
+import requests
 from keys import *
 from libs.Tweet import HashtagStream
+from libs.Hashtag import HashtagArticle
 from utils.TextDecoder import addSymbolHash
 
 
@@ -12,7 +13,7 @@ app = Flask(__name__)
 
 # cors configuration
 app.config['CORS_HEADERS'] = 'Content-Type'
-cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+cors = CORS(app)
 
 # stream
 stream = HashtagStream(API_KEY, API_KEY_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
@@ -51,6 +52,16 @@ def stopStream():
     stream.disconnect()
 
     return style+'Streaming stopped'
+
+
+# it will manage the current status
+@app.route('/status')
+@cross_origin()
+def currentStatus():
+    session = requests.get(f'https://twitter-streaming-365514-default-rtdb.firebaseio.com/{stream.topic}.json').json()
+
+    return session[list(session.keys())[0]] if session else HashtagArticle({'hashtag':stream.topic}).__dict__
+    
 
 
 if __name__ == '__main__':

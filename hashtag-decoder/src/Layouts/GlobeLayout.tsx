@@ -2,7 +2,6 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
 import GeneralInformation from '../Components/GeneralInformation';
-import socketIOClient from 'socket.io-client';
 import {
 	Chart as ChartJS,
 	CategoryScale,
@@ -81,23 +80,15 @@ type Props = {
 const GlobeLayout: React.FC<Props> = ({ changeLayout, data }) => {
 	const navigate = useNavigate();
 
-	const ENDPOINT = 'http://localhost:5000'
-	
-	const closeSocket = () => {
-		const socket = socketIOClient(ENDPOINT);
-		socket.disconnect();
-	}
 
 	let timeline = data?.sentiment_timeline
 
-	if(timeline?.length > 5){
-		timeline = timeline.slice(0,5)
-	}
+	
 	const dataA = {
 		labels:timeline?.map((item:any) => item),
 		datasets: [
 			{	
-				label: `${Math.round(data?.sentiment_avg?.positive*100)}% Happy`,
+				label: `${Math.round(data?.sentiment_average?.positive*100)}% Happy`,
 				data: timeline?.map((item:any) => item?.positive),
 				borderColor: '#4690FF',
 				fill: false,
@@ -110,7 +101,7 @@ const GlobeLayout: React.FC<Props> = ({ changeLayout, data }) => {
 				],
 			},
 			{
-				label: `${Math.round(data?.sentiment_avg?.negative*100)}% Bad`,
+				label: `${Math.round(data?.sentiment_average?.negative*100)}% Bad`,
 				data: timeline?.map((item:any) => item?.negative),
 				borderColor: '#F64BBC',
 				fill: false,
@@ -123,7 +114,7 @@ const GlobeLayout: React.FC<Props> = ({ changeLayout, data }) => {
 				],
 			},
 			{
-				label: `${Math.round(data?.sentiment_avg?.neutral*100)}% Neutral`,
+				label: `${Math.round(data?.sentiment_average?.neutral*100)}% Neutral`,
 				data: timeline?.map((item:any) => item?.neutral),
 				borderColor: '#3E03A1',
 				fill: false,
@@ -149,9 +140,10 @@ const GlobeLayout: React.FC<Props> = ({ changeLayout, data }) => {
 			</div>
 			<div className="h-1/6">
 				<h1 className="text-white text-4xl font-bold"
-					onClick={() => {
+					onClick={
+						async () => {
 							navigate('/')
-							closeSocket()
+							await fetch('http://127.0.0.1:5000/stop')
 						}
 					}
 				>
