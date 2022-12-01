@@ -98,8 +98,6 @@ class HashtagArticle:
             self.hashtags.append(addSymbolHash(self.hashtag))
             self.hashtags_count += 1
         
-        if len(self.sentiment_timeline) > 5:
-            self.sentiment_timeline = self.sentiment_timeline[-4:]
 
 
     def insertTweet(self, tweet:dict):
