@@ -9,7 +9,7 @@ const SearchLayout:React.FC = () => {
 		<div className="flex justify-center h-full">
 			<div className="grid content-center">
 				<form onSubmit={() => {
-					fetch('http://localhost:5000/hash/'+search.replace('#', ''))
+					fetch('http://127.0.0.1:5000/hash/'+search.replace('#', ''))
 					navigate('/stream')
 
 				}}>
@@ -19,6 +19,7 @@ const SearchLayout:React.FC = () => {
 							name="name" 
 							style={{all:'unset', caretColor: 'transparent'}}
 							value={search}
+							// eslint-disable-next-line
 							onChange={search => setSearch('#'+search.target.value.replace(/(#|\s|[<>\-_\.`^\[\]\{\}ç¨´:,;=\(\)\/&%$·"!\+\*\?\¡\¿Ç…„–œæ€®†¥  øπå∫∂ƒ™¶§ ~Ω∑©√ß µñÑ≠”“÷¬∞¢#@\|≤≥\\ºª‚])/g,''))}
 						/>
 					</h1>

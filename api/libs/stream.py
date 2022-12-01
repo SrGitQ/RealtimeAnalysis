@@ -95,7 +95,7 @@ class HashtagSimpleStream(tweepy.Stream):
         # send data
         send_data(tweet_data.__dict__)
         
-        print('tweet_data.__dict__')
+        print(tweet_data.__dict__)
 
 
 if __name__ == '__main__':

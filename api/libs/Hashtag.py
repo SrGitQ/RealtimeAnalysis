@@ -57,7 +57,7 @@ class HashtagArticle:
         :amendData()
 
     '''
-    def __init__(self, data:dict|None=None):
+    def __init__(self, data:dict=None):
         self.hashtag:str = ''
         self.tweets_count:int = 0
         self.users_list:list[str] = []
