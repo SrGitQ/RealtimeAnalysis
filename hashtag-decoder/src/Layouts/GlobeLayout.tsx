@@ -81,53 +81,40 @@ const GlobeLayout: React.FC<Props> = ({ changeLayout, data }) => {
 	const navigate = useNavigate();
 
 
-	let timeline = data?.sentiment_timeline
-
-	
-	const dataA = {
-		labels:timeline?.map((item:any) => item),
-		datasets: [
-			{	
-				label: `${Math.round(data?.sentiment_average?.positive*100)}% Happy`,
-				data: timeline?.map((item:any) => item?.positive),
-				borderColor: '#4690FF',
-				fill: false,
-				backgroundColor: [
-				  'rgba(0, 0, 0, 0.0)',
-				  'rgba(0, 0, 0, 0.0)',
-				  'rgba(0, 0, 0, 0.0)',
-				  'rgba(0, 0, 0, 0.0)',
-				  'rgba(70, 144, 255, 1)',
-				],
-			},
-			{
-				label: `${Math.round(data?.sentiment_average?.negative*100)}% Bad`,
-				data: timeline?.map((item:any) => item?.negative),
-				borderColor: '#F64BBC',
-				fill: false,
-				backgroundColor: [
-				  'rgba(0, 0, 0, 0.0)',
-				  'rgba(0, 0, 0, 0.0)',
-				  'rgba(0, 0, 0, 0.0)',
-				  'rgba(0, 0, 0, 0.0)',
-				  'rgba(246, 75, 188, 1)',
-				],
-			},
-			{
-				label: `${Math.round(data?.sentiment_average?.neutral*100)}% Neutral`,
-				data: timeline?.map((item:any) => item?.neutral),
-				borderColor: '#3E03A1',
-				fill: false,
-				backgroundColor: [
-				  'rgba(0, 0, 0, 0.0)',
-				  'rgba(0, 0, 0, 0.0)',
-				  'rgba(0, 0, 0, 0.0)',
-				  'rgba(0, 0, 0, 0.0)',
-				  'rgba(62, 3, 161, 1)',
-				],
-			},
-		],
-	};
+	const masterpiece = (timeline:any, sentiment:any) => {
+		const renderEmpty = (items:any, color:any) => {
+			let items_ = items.map((e:any) => 'rgba(0, 0, 0, 0.0)')
+			items_?.pop()
+			items_.push(color)
+			return items_
+		}
+		return {
+			labels:timeline?.map((item:any) => item),
+			datasets: [
+				{	
+					label: `${Math.round(sentiment?.positive*100)}% Happy`,
+					data: timeline?.map((item:any) => item?.positive),
+					borderColor: '#4690FF',
+					fill: false,
+					backgroundColor: renderEmpty(timeline, 'rgba(70, 144, 255, 1)'),
+				},
+				{
+					label: `${Math.round(sentiment?.negative*100)}% Bad`,
+					data: timeline?.map((item:any) => item?.negative),
+					borderColor: '#F64BBC',
+					fill: false,
+					backgroundColor: renderEmpty(timeline, 'rgba(246, 75, 188, 1)'),
+				},
+				{
+					label: `${Math.round(sentiment?.neutral*100)}% Neutral`,
+					data: timeline?.map((item:any) => item?.neutral),
+					borderColor: '#3E03A1',
+					fill: false,
+					backgroundColor: renderEmpty(timeline, 'rgba(62, 3, 161, 1)'),
+				},
+			],
+		};
+	}
 
 
 	return (
@@ -147,12 +134,31 @@ const GlobeLayout: React.FC<Props> = ({ changeLayout, data }) => {
 						}
 					}
 				>
-					{data?.hashtag?.includes('#') ? data?.hashtag : `#${data?.hashtag}`}
+					{data?.one?.hashtag + " vs. " + data?.two?.hashtag}
 				</h1>
 			</div>
 			<GeneralInformation data={data}/>
-			<div className="h-[6rem] pr-48 pl-24">
-				<Line options={options} data={dataA}/>
+			<div className="h-[6rem] pr-48 pl-24 flex w-full">
+				<div className='w-full'>
+					<div className='m-2 h-[90px]'>
+						<div className='text-white text-[8px] text-center'>Roverta</div>
+						<Line options={options} data={masterpiece(data?.one?.sentiment_timeline_rov, data?.one?.sentiment_average_rov )}/>
+					</div>
+					<div className='m-2 h-[90px]'>
+						<div className='text-white text-[8px] text-center'>Our model</div>
+						<Line options={options} data={masterpiece(data?.two?.sentiment_timeline_our, data?.two?.sentiment_average_our )}/>
+					</div>
+				</div>
+				<div className='w-full'>
+					<div className='m-2 h-[90px]'>
+						<div className='text-white text-[8px] text-center'>Roverta</div>
+						<Line options={options} data={masterpiece(data?.one?.sentiment_timeline_rov, data?.one?.sentiment_average_rov )}/>
+					</div>
+					<div className='m-2 h-[90px]'>
+						<div className='text-white text-[8px] text-center'>Our model</div>
+						<Line options={options} data={masterpiece(data?.two?.sentiment_timeline_our, data?.two?.sentiment_average_our )}/>
+					</div>	
+				</div>
 			</div>
 		</div>
 	);
