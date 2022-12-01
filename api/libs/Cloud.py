@@ -347,6 +347,12 @@ class HashtagArticle:
         '''
         [setattr(self, key, data[key]) for key in data]
 
+
+class Comparision:
+    def __init__(self, ):
+        self.one = HashtagArticle()
+        self.two = HashtagArticle()
+
 @functions_framework.http
 def entry(request):
     """HTTP Cloud Function.
@@ -359,18 +365,22 @@ def entry(request):
         <https://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response>.
     """
     tweet = request.get_json(silent=True)
-    topic = tweet['topic']
-    article = requests.get('https://twitter-streaming-365514-default-rtdb.firebaseio.com/'+topic+'.json').json()
+    comparision = requests.get('https://twitter-streaming-365514-default-rtdb.firebaseio.com/comparision.json').json()
 
-    if article:
-        id = list(article.keys())[0]
-        current_article = HashtagArticle(article[id])
-        current_article.insertTweet(tweet)
-        requests.put('https://twitter-streaming-365514-default-rtdb.firebaseio.com/'+topic+'.json', json={id:current_article.__dict__})
+    if comparision:
+        comparision_article = Comparision(comparision)
+        if '#HouseOfTheDragon' in tweet['hashtags'] or '#houseofthedragon' in tweet['hashtags']:
+            comparision_article.one.insertTweet(tweet)
+        else:
+            comparision_article.two.insertTweet(tweet)
+        requests.put('https://twitter-streaming-365514-default-rtdb.firebaseio.com/comparision.json', json={comparision.__dict__})
         
     else:
-        current_article = HashtagArticle({'hashtag':topic})
-        current_article.insertTweet(tweet)
-        requests.post('https://twitter-streaming-365514-default-rtdb.firebaseio.com/'+topic+'.json', json=current_article.__dict__) 
+        comparision_article = Comparision()
+        if '#HouseOfTheDragon' in tweet['hashtags'] or '#houseofthedragon' in tweet['hashtags']:
+            comparision_article.one.insertTweet(tweet)
+        else:
+            comparision_article.two.insertTweet(tweet)
+        requests.post('https://twitter-streaming-365514-default-rtdb.firebaseio.com/comparision.json', json=comparision.__dict__) 
 
     return 'Hello !'

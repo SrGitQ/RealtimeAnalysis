@@ -54,13 +54,15 @@ def stopStream():
     return style+'Streaming stopped'
 
 
+from libs.Hashtag import Comparision
 # it will manage the current status
 @app.route('/status')
 @cross_origin()
 def currentStatus():
-    session = requests.get(f'https://twitter-streaming-365514-default-rtdb.firebaseio.com/{stream.topic}.json').json()
+    stream.filter(track=['#HouseOfTheDragon', '#RingsOfPower'], threaded=True, languages=['en', 'es'])
+    session = requests.get(f'https://twitter-streaming-365514-default-rtdb.firebaseio.com/comparision.json').json()
 
-    return session[list(session.keys())[0]] if session else HashtagArticle({'hashtag':stream.topic}).__dict__
+    return session[list(session.keys())[0]] if session else Comparision().__dict__
     
 
 

@@ -83,7 +83,8 @@ class TweetParser(Tweet):
     def __init__(self, topic='', user_name='', user_verified=False, tweet_text='', user_loc='', tweet_id='', source='', hashtags=[], mentions=0):
         super().__init__(topic, user_name, user_verified, tweet_text, user_loc, tweet_id, source, hashtags, mentions)
 
-        self.sentiment:str = ''
+        self.sentiment_rov:str = ''
+        self.sentiment_our:str = ''
 
         self.__normalize_tweet()
 
@@ -118,7 +119,8 @@ class TweetParser(Tweet):
         max_score = max([x['score'] for x in data[0]])
         
         # get the label  and asign
-        self.sentiment = [x['label'] for x in data[0] if x['score'] == max_score][0].lower()
+        self.sentimen_rov = [x['label'] for x in data[0] if x['score'] == max_score][0].lower()
+        self.sentiment_our = 'positive'#requests.post('',json={"text": self.tweet_text}).json()
     
 
     def __identify_location(self, ):

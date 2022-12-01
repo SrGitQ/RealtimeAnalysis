@@ -184,7 +184,7 @@ type Props = {
 const StreamRunner: React.FC<Props> = ({data}) => {
 	const [mode, setMode] = useState("globe");
 
-	return (
+	return ( 
 		<div>
 			{mode === "globe" ? <GlobeLayout changeLayout={setMode} data={data}/> : null}
 			{mode === "graph" ? <GraphLayout changeLayout={setMode} data={data}/> : null}

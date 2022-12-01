@@ -175,3 +175,9 @@ class HashtagArticle:
         '''
         [setattr(self, key, data[key]) for key in data]
 
+
+class Comparision:
+    def __init__(self, ):
+        self.one = HashtagArticle()
+        self.two = HashtagArticle()
+
